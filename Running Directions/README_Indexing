@@ -1,0 +1,40 @@
+Before Runnning: 
+Please run with Python 3.7 or higher. My implementation 
+relys on ordered dictionaries which were not supported until then.
+
+The only non-standard library that was used was my Porter Stemmer. 
+Please make sure you install nltk before running. 
+https://www.nltk.org/install.html
+
+Also make sure that stops.txt is in the source directory
+
+HOW TO RUN:
+
+I used switches to parse my program. Below are their calls 
+and how to use them 
+
+-i [input directory] *REQUIRED* 
+Please provide the path to the given folder that contains the files to run. 
+Do not include the last "/" in the folder. 
+
+-o [output directory]
+If you want to specifcy the ouput directory to be set, please add it here. If 
+no directory is given, by default it will create and output a "Output" 
+folder. 
+
+-memory [memory constraint]
+If you want to specificy a memory constraint, add the desired memory after this tag. 
+If no tag is given, my program will use unlimted memory
+
+Indexing tags (Use to pick which indexer to use)
+-single
+-singlePos
+-stem
+-twoPhrase
+-threePhrase
+
+Some example commands: 
+python3 build.py -single -i BigSample -memory 1000
+python3 build.py -i BigSample -single -o OutputSpecail 
+python3 build.py -i BigSample -stem -memory 100000
+python3 build.py -twoPhrase -i BigSample
