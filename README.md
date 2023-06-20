@@ -13,7 +13,7 @@ There are three main classes that define my Project 1 implementation: DocumentNo
 (Note you MUST run my code with Python 3.7 or higher because ordered dictionaries were not supported until then)
 
  
-![Diagram of File Structure of Index](/assets/images/electrocat.png)
+![Diagram of File Structure of Index](https://github.com/ben-sikora/search-engine/assets/images/electrocat.png)
 *Figure 1: Outline of the nested dictionary structure.* 
 
 
