@@ -8,6 +8,7 @@ I want to emphasize that this project was entirely my own work and did not use a
 ### Indexer
 
 ***General Structure***
+
 There are three main classes that define my Project 1 implementation: DocumentNode, FileManager, and Lexicon. Document Node contains most of the information found for a term in each document and acts as a “row” of the posting list. It stores the document id, the frequency of a specific term in the document, and if applicable the positions of those terms. FileManager is a class that deals with the writing/management of files to disk and ultimately merging them together. Most of my implementation, however, lies within the Lexicon class. The Lexicon class contains an ordered dictionary that acts as both my posting list and lexicon. An ordered dictionary was imperative because as terms are added/removed it is important to not change the order of the dictionary as it is acting as my lexicon. Inside the ordered dictionary, lies a key value pair of the term and a second ordered dictionary. The second ordered dictionary stores a document id and that document’s node as a key value pair. Therefore, with a term and it’s docID, I can efficiently find and count the appropriate Document Node. Dictionaries were imperative in the design of my project because they support search, insert, and delete in log(n) time. As I will be accessing these dictionaries for each token of the database, any delay in these processes could have exponential effects on my running time (See Figure 2 and 3 in analysis). 
 
 (Note you MUST run my code with Python 3.7 or higher because ordered dictionaries were not supported until then)
@@ -19,6 +20,7 @@ There are three main classes that define my Project 1 implementation: DocumentNo
 
 
 **Processing A Document: Start to Finish** 
+
 The entire process for processing, tokenizing, and storing the documents lies within the “createLexiconDir” function of the Lexicon class. Much of the resetting and counting that happens between documents, also occurs in this function. 
 
 1)	*Pre-Processing*
@@ -57,6 +59,7 @@ d.	Separate thresholds were chosen for my phrases. To be counted in my two-phras
 
 ### Scorer
 ***General Structure***
+
 When going about my design for scoring, I had two goals in mind: The first was to never read through the posting list more than once. And the second was to minimize the number of duplicate calculations. The structure I then came to, was a series of dictionaries that stored “evaluation” nodes for both documents and terms. Upon reading the posting list, I would create and manage these nodes so that they contain all the relevant information for a given term or document. The goal of making “evaluation” nodes was so that when I needed a statistic about a term or document, I would only have to find the appropriate node and type the function. The evaluation nodes also made it intuitive for me to store document and term weights, which solve my initial set out of removing duplicate calculations. For simplicity, I also applied the node model to the queries. Although I believe there are other structures that minimize storage space better, my end-design made it very intuitive to calculate Cosine, BM25, and Dirichlet Smoothing relevancy scores. The entire structure is created, stored, and run through the Evaluator class. 
  
 
@@ -66,6 +69,7 @@ When going about my design for scoring, I had two goals in mind: The first was t
 
 
 **Program Flow of Static Searching**
+
 The entire process for static searching is contained with the “staticSearching” method of the Evaluator Class. 
 
 1)	*Reading Files in and Query Processing* 
@@ -94,11 +98,12 @@ Since for every query there can be two sets of scores, one for phrasing or proxi
 
 
 **Design Decisions for Retrieval Methods**
+
 All
 1.	If a query term is not in the collection at all, that term is skipped. This was chosen because although BM25 can handle having no terms in the collection, cosine and Dirichlet Smoothing become undefined (Dividing by 0 for idf of cosine, and log of 0 in Dirichlet Smoothing). 
 Cosine: 
 1.	As specified in the project, I used this normalized weight function.  
-a.	 ![Cosine Normalized Weight Function Equation](/assets/figure2Scorer.jpg)
+a.	 ![Cosine Normalized Weight Function Equation](/assets/figure2Scorer.png)
 
 BM25
 1.	The following constants for BM25 were chosen for both Elastic Search and My Engine (Note K2 is not an option with Elastic Search). Please see Tables 4-6 for the justification of this decision. 
@@ -107,15 +112,17 @@ b.	B= 0.75
 c.	K2= 500
 LM
 1.	For my language model, I chose a Dirichlet Smoothing query likelihood model, specifically the log version of Dirichlet Smoothing. 
-a.	![LM Dirchlet Smoothing Weight Function Equation](/assets/figure3Scorer.jpg)
+a.	![LM Dirchlet Smoothing Weight Function Equation](/assets/figure3Scorer.png)
 b.	For u, I used 429 (the average document length in the collection) for both my own engine and Elastic Search. 
 
 ### Query Expansion and Reduction
 
 ***General Structure***
+
 My goal for this project was to try to integrate as much of query reduction and expansion into project two as possible. This way I would be able to compare the results from my project two with a high degree of confidence and, if there were any changes needed to be made to query scoring, reduction and expansion would not need to be changed. It was because of this that no new classes were created for this project, and the entire structure relies within the Evaluator and queryBuild classes. For the evaluator class specific query expansion, reduction, and combined methods were added but the relevance calculation methods for BM25 or the language model were not modified. And, for the queryBuild class, there were only changes to the both the query file reading and to adding of term weights. Overall, I was pleased with how integrated my project as I was able to use many of the methods I already had in place from project two.  
 
 **Overall Design Decisions**
+
 1)	*Using Only Single Indexing* 
 I chose only to use single indexing, instead of stemming, phrases, or positional, because since the goal of this project is to examine the effects of query reduction and expansion, I thought it would be best to only use one indexer for comparison. In addition, I was also considering these factors: 
 a.	Phrase and positional indexing don’t inherently apply for query expansion.
@@ -130,6 +137,7 @@ Again, since the goal for this project is to experiment with reduction and expan
 The default parameters for my project are 5 documents retrieved per query and 5 terms per document. The default query threshold is 0.6. These defaults were chosen as they provide the best performance with BM25 across each of the methods (Table 1, Table 5, and Table 7). If you ever want to change these defaults, please consult the read me for this project as you can do so from the terminal.  
 
 **Program Flow and Design Decisions of Query Expansion**  
+
 For Query Expansion, I chose to do the Rocchio Vector Space Relevance Feedback without the subtracting of non-relevant terms (thus a y of 0). The entire structure of query expansion lies in the “queryExpansion” method of the Evaluator Class. 
 
 1) *Reading Files in and Scoring*
@@ -142,6 +150,7 @@ The actual expansion of the query is contained within the “makeExpansionQuery�
 After the new queries have been created, I clear and rerun the scoring of the documents with the new queries and print the ranked results. 
 
 **Program Flow and Design Decisions of Query Reduction**  
+
 For Query Reduction, I chose to do a percentage total of the query terms based on term idf. The entire structure of query expansion lies in the “queryReduction” method of the Evaluator Class. 
 
 1)	*Reading Files In*
@@ -155,6 +164,7 @@ After the new queries have been created, I score the documents using the specifi
 
 
 **Program Flow and Design Decisions of Combined Query Expansion and Reduction** 
+
 For the combined Query Reduction and Expansion, I chose to run reduction first and then expansion. The entire structure of combined query reduction and expansion lies in the “queryReduction” method of the Evaluator Class. 
 
 1)	*Reading Files In*
